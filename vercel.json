@@ -8,6 +8,9 @@
   "functions": {
     "api/watch.js": {
       "maxDuration": 60
+    },
+    "api/generate-sql.js": {
+      "maxDuration": 60
     }
   }
 }

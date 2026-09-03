@@ -38,10 +38,22 @@ psql -U <user> -d <database> -f restaurantMenu.sql
 
 `api/watch.js` + `vercel.json` wire this up as a Vercel Cron Job. Set `POSTGRES_URL` (and optionally `CRON_SECRET`, which Vercel sets automatically as a request header when configured) as environment variables on the Vercel project.
 
+## Manual SQL preview (no database write)
+
+`api/generate-sql.js` fetches whatever PDF is currently linked on the UoWM page, parses and translates it, and returns the generated SQL as plain text — it never touches the database. Useful for reviewing the SQL yourself before deciding whether to apply it.
+
+```
+https://<your-deployment>.vercel.app/api/generate-sql?key=<CRON_SECRET>
+```
+
+Open that in a browser (or `curl` it) to get the SQL back as a downloadable text response. It's gated by the same `CRON_SECRET` as the cron job — accepted either as `?key=` or as an `Authorization: Bearer <CRON_SECRET>` header.
+
 ## Project structure
 
 - `lib/pdf/` — a from-scratch PDF table/text extraction layer built on `pdfjs-dist`, ported line-for-line from [pdfplumber](https://github.com/jsvine/pdfplumber)'s table-detection algorithm (which the project originally relied on via Python), since this document's tables are reconstructed from the PDF's drawn grid rectangles rather than plain text layout.
 - `lib/utils.js` — menu parsing (day/column detection, SQL generation).
 - `lib/translate.js` — Greek→English translation via Google Translate's `translate.google.com/m` endpoint.
-- `lib/main.js` — CLI entry point.
-- `lib/watchAndUpdate.js` / `api/watch.js` — the automated watcher and its Vercel Cron entry point.
+- `lib/main.js` — CLI entry point and the shared parse/translate/build-SQL pipeline.
+- `lib/watchAndUpdate.js` — PDF-on-page discovery, plus the DB-writing watcher and the DB-free preview generator.
+- `api/watch.js` — Vercel Cron entry point (writes to the database).
+- `api/generate-sql.js` — manual preview endpoint (does not write to the database).
