@@ -44,22 +44,20 @@ def get_stored_pdf_url(conn) -> str | None:
         return row[0] if row else None
 
 
-def main():
+def run_watch() -> str:
+    """Runs the check once. Returns a one-line human-readable result."""
     db_url = os.environ.get("POSTGRES_URL") or os.environ.get("POSTGRES_URL_NON_POOLING")
     if not db_url:
-        sys.exit("Set POSTGRES_URL (or POSTGRES_URL_NON_POOLING) in the environment.")
+        raise RuntimeError("Set POSTGRES_URL (or POSTGRES_URL_NON_POOLING) in the environment.")
 
     pdf_url = find_pdf_url(PAGE_URL)
-    print(f"Found PDF on page: {pdf_url}")
 
     conn = psycopg2.connect(db_url)
     try:
         stored_url = get_stored_pdf_url(conn)
         if stored_url == pdf_url:
-            print("No change since last run.")
-            return
+            return "No change since last run."
 
-        print(f"New PDF detected (previously: {stored_url!r}). Downloading and processing...")
         resp = requests.get(pdf_url, timeout=60)
         resp.raise_for_status()
 
@@ -69,7 +67,6 @@ def main():
 
         weeks_gr = []
         with pdfplumber.open(tmp_path) as pdf:
-            print(f"Pages found: {len(pdf.pages)}")
             for page in pdf.pages:
                 weeks_gr.append(parse_week_from_page(page))
 
@@ -79,9 +76,16 @@ def main():
         with conn.cursor() as cur:
             cur.execute(sql_content)
         conn.commit()
-        print("Database updated successfully.")
+        return f"Database updated successfully. New PDF: {pdf_url}"
     finally:
         conn.close()
+
+
+def main():
+    try:
+        print(run_watch())
+    except RuntimeError as e:
+        sys.exit(str(e))
 
 
 if __name__ == "__main__":

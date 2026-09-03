@@ -1,0 +1,13 @@
+{
+  "crons": [
+    {
+      "path": "/api/watch",
+      "schedule": "0 6 * 1 *"
+    }
+  ],
+  "functions": {
+    "api/watch.py": {
+      "maxDuration": 60
+    }
+  }
+}
