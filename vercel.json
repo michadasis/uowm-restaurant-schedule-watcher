@@ -6,7 +6,7 @@
     }
   ],
   "functions": {
-    "api/watch.py": {
+    "api/watch.js": {
       "maxDuration": 60
     }
   }

@@ -1,4 +1,0 @@
-pdfplumber
-deep-translator
-requests
-psycopg2-binary

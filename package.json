@@ -1,0 +1,14 @@
+{
+  "name": "uowm-restaurant-schedule-watcher",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Reads the UoWM restaurant menu PDF and pushes it into Supabase Postgres.",
+  "scripts": {
+    "convert": "node lib/main.js"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^4.10.38",
+    "pg": "^8.13.1"
+  }
+}
