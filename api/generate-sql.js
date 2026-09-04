@@ -25,8 +25,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { pdfUrl, sql } = await generateSqlPreview();
-    const header = `-- Source PDF: ${pdfUrl}\n-- Generated: ${new Date().toISOString()}\n-- This SQL was NOT applied to any database. Review before running it.\n\n`;
+    const { pdfUrl, sql, itemCount, lowItemCount } = await generateSqlPreview();
+    const warning = lowItemCount
+      ? `-- WARNING: only ${itemCount} menu item(s) parsed. This PDF likely failed to\n-- parse correctly. Running this SQL would still truncate menu_items with\n-- nothing meaningful to replace it. Do not apply this without checking.\n`
+      : "";
+    const header = `-- Source PDF: ${pdfUrl}\n-- Generated: ${new Date().toISOString()}\n-- This SQL was NOT applied to any database. Review before running it.\n${warning}\n`;
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.status(200).send(header + sql);
   } catch (err) {
