@@ -34,26 +34,26 @@ psql -U <user> -d <database> -f restaurantMenu.sql
 
 ## Automated watcher
 
-`lib/watchAndUpdate.js` checks the UoWM restaurant-schedule page for a new/changed menu PDF, and if it differs from the URL already recorded in `menu_meta.source_pdf_url`, downloads it, parses and translates it, and applies the resulting SQL directly to Postgres. Requires `POSTGRES_URL` (or `POSTGRES_URL_NON_POOLING`) in the environment.
+`lib/watchAndUpdate.js` checks the UoWM restaurant-schedule page for a new menu PDF. If it differs from the URL recorded in `menu_meta.source_pdf_url`, it downloads it, parses and translates it, and applies the resulting SQL to Postgres. Requires `POSTGRES_URL` (or `POSTGRES_URL_NON_POOLING`) in the environment.
 
-`api/watch.js` + `vercel.json` wire this up as a Vercel Cron Job. Set `POSTGRES_URL` (and optionally `CRON_SECRET`, which Vercel sets automatically as a request header when configured) as environment variables on the Vercel project.
+`api/watch.js` and `vercel.json` run this on a schedule via Vercel Cron. Set `POSTGRES_URL` and `CRON_SECRET` as environment variables on the Vercel project.
 
-## Manual SQL preview (no database write)
+## Manual SQL preview
 
-`api/generate-sql.js` fetches whatever PDF is currently linked on the UoWM page, parses and translates it, and returns the generated SQL as plain text — it never touches the database. Useful for reviewing the SQL yourself before deciding whether to apply it.
+`api/generate-sql.js` fetches the current PDF, parses and translates it, and returns the generated SQL as plain text. It does not write to the database.
 
 ```
 https://<your-deployment>.vercel.app/api/generate-sql?key=<CRON_SECRET>
 ```
 
-Open that in a browser (or `curl` it) to get the SQL back as a downloadable text response. It's gated by the same `CRON_SECRET` as the cron job — accepted either as `?key=` or as an `Authorization: Bearer <CRON_SECRET>` header.
+Pass the key as `?key=` or as an `Authorization: Bearer <CRON_SECRET>` header.
 
 ## Project structure
 
-- `lib/pdf/` — a from-scratch PDF table/text extraction layer built on `pdfjs-dist`, ported line-for-line from [pdfplumber](https://github.com/jsvine/pdfplumber)'s table-detection algorithm (which the project originally relied on via Python), since this document's tables are reconstructed from the PDF's drawn grid rectangles rather than plain text layout.
-- `lib/utils.js` — menu parsing (day/column detection, SQL generation).
-- `lib/translate.js` — Greek→English translation via Google Translate's `translate.google.com/m` endpoint.
+- `lib/pdf/` — PDF table and text extraction, built on `pdfjs-dist`.
+- `lib/utils.js` — menu parsing and SQL generation.
+- `lib/translate.js` — Greek to English translation via Google Translate.
 - `lib/main.js` — CLI entry point and the shared parse/translate/build-SQL pipeline.
-- `lib/watchAndUpdate.js` — PDF-on-page discovery, plus the DB-writing watcher and the DB-free preview generator.
-- `api/watch.js` — Vercel Cron entry point (writes to the database).
-- `api/generate-sql.js` — manual preview endpoint (does not write to the database).
+- `lib/watchAndUpdate.js` — PDF discovery, the database-writing watcher, and the preview generator.
+- `api/watch.js` — Vercel Cron entry point. Writes to the database.
+- `api/generate-sql.js` — manual preview endpoint. Does not write to the database.
