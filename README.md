@@ -36,7 +36,7 @@ psql -U <user> -d <database> -f restaurantMenu.sql
 
 `lib/watchAndUpdate.js` checks the UoWM restaurant-schedule page for a new menu PDF. If it differs from the URL recorded in `menu_meta.source_pdf_url`, it downloads it, parses and translates it, and applies the resulting SQL to Postgres. Requires `POSTGRES_URL` (or `POSTGRES_URL_NON_POOLING`) in the environment.
 
-`api/watch.js` and `vercel.json` run this on a schedule via Vercel Cron. Set `POSTGRES_URL` and `CRON_SECRET` as environment variables on the Vercel project.
+`api/watch.js` and `vercel.json` run this once a day via Vercel Cron, timed for 17:00 Athens time year-round using two schedules to account for daylight saving. Set `POSTGRES_URL` and `CRON_SECRET` as environment variables on the Vercel project.
 
 ## Manual SQL preview
 
