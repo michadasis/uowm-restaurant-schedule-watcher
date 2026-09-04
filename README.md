@@ -34,9 +34,9 @@ psql -U <user> -d <database> -f restaurantMenu.sql
 
 ## Automated watcher
 
-`lib/watchAndUpdate.js` checks the UoWM restaurant-schedule page for a new menu PDF. If it differs from the URL recorded in `menu_meta.source_pdf_url`, it downloads it, parses and translates it, and applies the resulting SQL to Postgres. Requires `POSTGRES_URL` (or `POSTGRES_URL_NON_POOLING`) in the environment.
+`lib/watchAndUpdate.js` checks the UoWM restaurant-schedule page for a new menu PDF. If its URL or content hash differs from what's recorded in `menu_meta`, it downloads it, parses and translates it, and applies the resulting SQL to Postgres. Requires `POSTGRES_URL` (or `POSTGRES_URL_NON_POOLING`) in the environment.
 
-`api/watch.js` and `vercel.json` run this once a day via Vercel Cron, timed for 17:00 Athens time year-round using two schedules to account for daylight saving. Set `POSTGRES_URL` and `CRON_SECRET` as environment variables on the Vercel project.
+`api/watch.js` and `vercel.json` run this once a day via Vercel Cron, timed for 17:00 Athens time using two schedules to account for daylight saving. Vercel cron schedules don't track the exact DST switchover date, so this drifts by an hour on the days closest to it: a few days in late March, and most of October (EU DST doesn't end until late October, but the whole month is grouped with winter here). Set `POSTGRES_URL` and `CRON_SECRET` as environment variables on the Vercel project.
 
 ## Manual SQL preview
 

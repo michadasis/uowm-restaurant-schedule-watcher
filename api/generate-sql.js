@@ -5,14 +5,21 @@
 //
 // Protected by the same CRON_SECRET used for the cron job. Open
 // https://<your-deployment>/api/generate-sql?key=<CRON_SECRET> in a browser,
-// or omit the key check by leaving CRON_SECRET unset (not recommended once
-// this is deployed, since anyone could hit it and burn function time).
+// or pass it as an Authorization: Bearer <CRON_SECRET> header.
 import { generateSqlPreview } from "../lib/watchAndUpdate.js";
+import { timingSafeStringEqual } from "../lib/auth.js";
 
 export default async function handler(req, res) {
   const cronSecret = process.env.CRON_SECRET;
-  const providedKey = req.headers.authorization === `Bearer ${cronSecret}` || req.query.key === cronSecret;
-  if (cronSecret && !providedKey) {
+  if (!cronSecret) {
+    res.status(500).send("Server misconfigured: CRON_SECRET is not set.");
+    return;
+  }
+  const authHeader = req.headers.authorization || "";
+  const queryKey = typeof req.query.key === "string" ? req.query.key : "";
+  const authorized =
+    timingSafeStringEqual(authHeader, `Bearer ${cronSecret}`) || timingSafeStringEqual(queryKey, cronSecret);
+  if (!authorized) {
     res.status(401).send("Unauthorized");
     return;
   }
@@ -23,6 +30,7 @@ export default async function handler(req, res) {
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.status(200).send(header + sql);
   } catch (err) {
-    res.status(500).send(String(err && err.message ? err.message : err));
+    console.error(err);
+    res.status(500).send("Internal error. Check server logs.");
   }
 }
