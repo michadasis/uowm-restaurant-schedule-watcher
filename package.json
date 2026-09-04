@@ -8,6 +8,7 @@
     "convert": "node lib/main.js"
   },
   "dependencies": {
+    "nodemailer": "^10.0.0",
     "pdfjs-dist": "^4.10.38",
     "pg": "^8.13.1"
   }

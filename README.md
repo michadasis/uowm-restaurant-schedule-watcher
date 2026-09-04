@@ -38,6 +38,8 @@ psql -U <user> -d <database> -f restaurantMenu.sql
 
 `api/watch.js` and `vercel.json` run this once a day via Vercel Cron, timed for 17:00 Athens time using two schedules to account for daylight saving. Vercel cron schedules don't track the exact DST switchover date, so this drifts by an hour on the days closest to it: a few days in late March, and most of October (EU DST doesn't end until late October, but the whole month is grouped with winter here). Set `POSTGRES_URL` and `CRON_SECRET` as environment variables on the Vercel project.
 
+`lib/notify.js` emails a notification whenever the watcher actually updates the menu, or when a run fails. Requires `GMAIL_USER`, `GMAIL_APP_PASSWORD`, and `NOTIFY_EMAIL` in the environment; if any of those are missing, notifications are silently skipped rather than breaking the watch itself. A routine "no change" day sends nothing.
+
 ## Manual SQL preview
 
 `api/generate-sql.js` fetches the current PDF, parses and translates it, and returns the generated SQL as plain text. It does not write to the database.
@@ -55,5 +57,6 @@ Pass the key as `?key=` or as an `Authorization: Bearer <CRON_SECRET>` header.
 - `lib/translate.js`: Greek to English translation via Google Translate.
 - `lib/main.js`: CLI entry point and the shared parse/translate/build-SQL pipeline.
 - `lib/watchAndUpdate.js`: PDF discovery, the database-writing watcher, and the preview generator.
+- `lib/notify.js`: email notifications on menu update or watcher failure.
 - `api/watch.js`: Vercel Cron entry point. Writes to the database.
 - `api/generate-sql.js`: manual preview endpoint. Does not write to the database.
