@@ -2,7 +2,11 @@
   "crons": [
     {
       "path": "/api/watch",
-      "schedule": "0 14 * * *"
+      "schedule": "0 14 * 4-9 *"
+    },
+    {
+      "path": "/api/watch",
+      "schedule": "0 15 * 1,2,3,10,11,12 *"
     }
   ],
   "functions": {
