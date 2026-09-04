@@ -3,7 +3,7 @@
 // plain text for you to review and apply yourself. Does NOT touch the
 // database (unlike /api/watch, which is what the cron job calls).
 //
-// Protected by the same CRON_SECRET used for the cron job — open
+// Protected by the same CRON_SECRET used for the cron job. Open
 // https://<your-deployment>/api/generate-sql?key=<CRON_SECRET> in a browser,
 // or omit the key check by leaving CRON_SECRET unset (not recommended once
 // this is deployed, since anyone could hit it and burn function time).

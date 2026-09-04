@@ -1,7 +1,7 @@
 // Vercel Cron entry point. Vercel invokes this with GET and, when the
 // CRON_SECRET env var is set on the project, an `Authorization: Bearer
-// <CRON_SECRET>` header — verified below so the endpoint can't be triggered
-// by anyone else.
+// <CRON_SECRET>` header. That header is verified below so the endpoint
+// can't be triggered by anyone else.
 import { runWatch } from "../lib/watchAndUpdate.js";
 
 export default async function handler(req, res) {

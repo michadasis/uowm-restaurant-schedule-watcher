@@ -50,10 +50,10 @@ Pass the key as `?key=` or as an `Authorization: Bearer <CRON_SECRET>` header.
 
 ## Project structure
 
-- `lib/pdf/` — PDF table and text extraction, built on `pdfjs-dist`.
-- `lib/utils.js` — menu parsing and SQL generation.
-- `lib/translate.js` — Greek to English translation via Google Translate.
-- `lib/main.js` — CLI entry point and the shared parse/translate/build-SQL pipeline.
-- `lib/watchAndUpdate.js` — PDF discovery, the database-writing watcher, and the preview generator.
-- `api/watch.js` — Vercel Cron entry point. Writes to the database.
-- `api/generate-sql.js` — manual preview endpoint. Does not write to the database.
+- `lib/pdf/`: PDF table and text extraction, built on `pdfjs-dist`.
+- `lib/utils.js`: menu parsing and SQL generation.
+- `lib/translate.js`: Greek to English translation via Google Translate.
+- `lib/main.js`: CLI entry point and the shared parse/translate/build-SQL pipeline.
+- `lib/watchAndUpdate.js`: PDF discovery, the database-writing watcher, and the preview generator.
+- `api/watch.js`: Vercel Cron entry point. Writes to the database.
+- `api/generate-sql.js`: manual preview endpoint. Does not write to the database.
